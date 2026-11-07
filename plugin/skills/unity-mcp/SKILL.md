@@ -20,6 +20,8 @@ local endpoint has no password. Only act on the project the user named.
    through `manage_script` / `script_apply_edits`.
 2. Do not install packages (`manage_packages`), run `execute_code` or `execute_menu_item`, or delete assets
    unless the user asked for it. Say what you are about to run first.
+   **Never call `generate_image`, `generate_audio`, `generate_model` or `blender_bridge`**: they can call paid
+   providers or other apps. Ask first.
 3. Do not run PlayMode tests (`run_tests` mode PlayMode) on Linux: upstream issue #1390 hangs the Editor.
    EditMode tests are fine.
 4. Save the scene (`manage_scene` save) before entering play mode, so a crash loses nothing.
@@ -40,7 +42,8 @@ local endpoint has no password. Only act on the project the user named.
 
 ## Before anything
 
-1. Call `set_active_instance` if more than one Editor is open; pick the project the user named.
+1. Call `set_active_instance` if more than one Editor is open. It needs the `Name@hash` form, not just the name:
+   read the `mcpforunity://instances` resource first. Only one Editor open means you can skip this.
 2. Call `manage_editor` for editor state. If it says compiling or in play mode, wait or stop play first.
 3. Call `read_console` (errors only) to see the starting state.
 
@@ -63,3 +66,32 @@ local endpoint has no password. Only act on the project the user named.
 - Pass numbers as quoted strings if a tool rejects them.
 - When something fails twice, stop and report the exact error text instead of retrying variations.
 - Report only what the tools returned. If a screenshot or console read failed, say so.
+
+## Tool quirks (tested against v10.3.0 on Unity 6000.3)
+
+- `create_script` fails if the file exists ("Use 'update'"). To change a script use `apply_text_edits`: it is a
+  **two-step call**. The first call returns `precondition_required` with `current_sha256`; repeat the same edit
+  with `precondition_sha256` set to it. Lines and columns are 1-indexed, taken from the compiler error
+  (`File.cs(4,68)`).
+- After any script change, `refresh_unity` with `compile: request` and `wait_for_ready: true`, then wait a few
+  seconds more (domain reload) before calling tools. Adding a component whose script has not compiled fails with
+  "Component type not found"; that means read the console, not retry.
+- `read_console` returns compile errors with file, line and column. Clear it (`action: clear`) before a run so
+  old errors do not confuse you.
+- Screenshots (`manage_camera`, action `screenshot`) are RGBA and the background is **transparent**, so a viewer
+  shows an empty white image. Add a Directional Light, give the camera an opaque background, and pass
+  `view_target` (an object name) so the camera aims at what you built. Composite onto a dark background before
+  judging an image. In batchmode `capture_source: scene_view` is unsupported; use `game_view`.
+- A new scene has no light and no camera: create both.
+
+## Starting an Editor for the bridge (headless)
+
+The bridge does not start by itself in batchmode and defaults to HTTP. To run an Editor you can drive without
+touching the user's saved Unity preferences, start it with:
+
+    UNITY_MCP_ALLOW_BATCH=1 Unity -batchmode -projectPath <project> \
+        -executeMethod MCPForUnity.Editor.McpCiBoot.StartStdioForCi
+
+That pins stdio for the session only and listens on 127.0.0.1:6400. Set `UNITY_MCP_STATUS_DIR` (the same value
+for the Editor and the server) to keep its status file out of the shared `~/.unity-mcp`. Stop it with SIGTERM
+and wait for the process to exit before starting another on the same project.
