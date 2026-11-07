@@ -27,7 +27,7 @@ they ask too.
    through `manage_script` / `script_apply_edits`.
 2. Do not install packages (`manage_packages`), run `execute_code` or `execute_menu_item`, or delete assets
    unless the user asked for it. Say what you are about to run first.
-   **Never call `generate_image`, `generate_audio`, `generate_model` or `blender_bridge`, `import_model`** (Sketchfab, bring-your-own key): they can call paid
+   **Never call `generate_image`, `generate_audio`, `generate_model`, `blender_bridge` or `import_model`** (Sketchfab, bring-your-own key): they can call paid
    providers or other apps. Ask first.
 3. Do not run PlayMode tests (`run_tests` mode PlayMode) on Linux: upstream issue #1390 hangs the Editor.
    EditMode tests are fine.
