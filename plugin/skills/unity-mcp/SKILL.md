@@ -24,6 +24,20 @@ local endpoint has no password. Only act on the project the user named.
    EditMode tests are fine.
 4. Save the scene (`manage_scene` save) before entering play mode, so a crash loses nothing.
 
+## Shared and live projects
+
+- **One Editor per project.** Unity locks a project to a single Editor, and other agents may be running batchmode
+  builds or tests on it. Run `scripts/preflight.sh <project>` first. If it reports LOCKED, or the project is
+  someone else's live branch, do **not** open it: work in a separate clone or worktree and hand changes back as a
+  branch or patch.
+- **Read the project's own docs first** (CLAUDE.md, AGENTS.md, README, HANDOFF, CONTEXT or similar) and follow them.
+  Where they name scripts for gates, builds, tests or clips, use those scripts. Do not reinvent them with
+  `execute_code`.
+- **Project profile.** If a skill named `unity-project-<project folder name>` exists, load it. It holds that
+  project's layout, conventions, gates and no-go areas, and it wins over the generic habits here.
+- Respect stop files (`STOP`, `HALT`) and any supervisor rules the project documents.
+- Large, mostly-ignored art folders are not in git. Do not commit binaries unless the project says to.
+
 ## Before anything
 
 1. Call `set_active_instance` if more than one Editor is open; pick the project the user named.
@@ -39,7 +53,9 @@ local endpoint has no password. Only act on the project the user named.
    `manage_prefabs`. Use `find_gameobjects` instead of guessing names, and read values back after setting them.
 4. Check with a screenshot (`manage_camera`) and the console.
 5. Enter play mode with `manage_editor`, wait, read the console, take a screenshot, leave play mode.
-6. Builds go through `manage_build`. Confirm the target and output folder with the user first.
+6. Builds go through `manage_build`, or the project's own build script if it has one. Confirm the target and
+   output folder with the user first.
+7. Prefer EditMode tests (`run_tests`, mode EditMode) as the check after a change. Report counts, not just "passed".
 
 ## Habits
 
