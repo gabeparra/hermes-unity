@@ -33,7 +33,7 @@ local endpoint has no password. Only act on the project the user named.
 - **Read the project's own docs first** (CLAUDE.md, AGENTS.md, README, HANDOFF, CONTEXT or similar) and follow them.
   Where they name scripts for gates, builds, tests or clips, use those scripts. Do not reinvent them with
   `execute_code`.
-- **Project profile.** If a skill named `unity-project-<project folder name>` exists, load it. It holds that
+- **Project profile.** If a skill named `unity-project-<project name>` (the repo or game name, not the generic folder name) exists, load it. It holds that
   project's layout, conventions, gates and no-go areas, and it wins over the generic habits here.
 - Respect stop files (`STOP`, `HALT`) and any supervisor rules the project documents.
 - Large, mostly-ignored art folders are not in git. Do not commit binaries unless the project says to.

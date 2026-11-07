@@ -16,3 +16,7 @@ UnityTest/
 *.key
 *.pem
 credentials*
+
+# private game sandbox and local profiles: never commit
+sandbox/
+local/
