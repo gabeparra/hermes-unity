@@ -1,12 +1,21 @@
 #!/usr/bin/env bash
 # Preflight for a Unity project before driving it with the unity MCP tools.
 # Usage: preflight.sh /path/to/UnityProject   (the folder that holds Assets/ and ProjectSettings/)
-# Read-only. Exit 0 = safe to open, 1 = do not open, 2 = usage error.
+# Read-only. Exit 0 = safe to open, 1 = do not open, 2 = usage error, 3 = a user guard flag is up (stop and wait).
 set -u
 P="${1:-}"
 [ -d "$P/Assets" ] && [ -f "$P/ProjectSettings/ProjectVersion.txt" ] || { echo "usage: preflight.sh <UnityProject>"; exit 2; }
 P="$(cd "$P" && pwd)"
 bad=0
+# User-defined "do not use the GPU / do not start heavy work" flag files (for example a gaming guard).
+# One path per line in ${XDG_CONFIG_HOME:-~/.config}/hermes-unity/guard-files, or colon-separated in UNITY_MCP_GUARD_FILES.
+guards="${UNITY_MCP_GUARD_FILES:-}"
+gf="${XDG_CONFIG_HOME:-$HOME/.config}/hermes-unity/guard-files"
+[ -r "$gf" ] && guards="$guards:$(grep -v '^#' "$gf" | tr '\n' ':')"
+IFS=: read -ra _g <<< "$guards"
+for f in "${_g[@]}"; do
+  [ -n "$f" ] && [ -e "$f" ] && { echo "GUARD:    $f exists: the user has asked for no heavy work right now. Do not start an Editor or drive Unity; tell the user and wait."; exit 3; }
+done
 ver="$(sed -n 's/^m_EditorVersion: //p' "$P/ProjectSettings/ProjectVersion.txt")"
 echo "project:  $P"
 echo "unity:    $ver"

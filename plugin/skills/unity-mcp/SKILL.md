@@ -13,6 +13,13 @@ metadata:
 The tools drive a **running Unity Editor**. They execute C# and edit assets with the user's privileges, and the
 local endpoint has no password. Only act on the project the user named.
 
+## Approvals
+
+This plugin asks to run in `untrusted` mode: Hermes asks the user before each write-capable tool, per tool. Do not
+try to avoid a prompt, batch around it or reword a request to get past it. A tool the user has set to "always"
+is theirs to decide. `read_console`, `find_gameobjects` and `manage_editor` are not marked read-only upstream, so
+they ask too.
+
 ## Rules
 
 1. Never edit `.unity`, `.prefab` or `.meta` files with file tools, and never run `Unity -batchmode` on a project
@@ -41,6 +48,10 @@ local endpoint has no password. Only act on the project the user named.
 - Large, mostly-ignored art folders are not in git. Do not commit binaries unless the project says to.
 
 ## Before anything
+
+0. **Guard flag.** Run `scripts/preflight.sh <project>` first. If it prints `GUARD` (exit 3), a flag the user set up
+   (for example a game that has the GPU) is up: do not start an Editor, do not drive Unity, tell the user and wait.
+   Hermes can still answer questions meanwhile. Never delete or ignore a guard flag.
 
 1. Call `set_active_instance` if more than one Editor is open. It needs the `Name@hash` form, not just the name:
    read the `mcpforunity://instances` resource first. Only one Editor open means you can skip this.

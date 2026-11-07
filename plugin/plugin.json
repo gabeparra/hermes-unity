@@ -3,9 +3,28 @@
   "name": "unity",
   "version": "0.1.0",
   "description": "Build in the Unity Editor from Hermes through the MCP for Unity server (pinned v10.3.0), with a workflow skill for scenes, scripts, compile errors, play mode, screenshots and builds.",
-  "author": { "name": "gabeparra", "url": "https://github.com/gabeparra" },
+  "author": {
+    "name": "gabeparra",
+    "url": "https://github.com/gabeparra"
+  },
   "homepage": "https://github.com/gabeparra/hermes-unity",
   "repository": "https://github.com/gabeparra/hermes-unity",
   "license": "MIT",
-  "keywords": ["unity", "unity6", "mcp", "gamedev", "csharp", "editor"]
+  "keywords": [
+    "unity",
+    "unity6",
+    "mcp",
+    "gamedev",
+    "csharp",
+    "editor"
+  ],
+  "extensions": {
+    "com.nousresearch.hermes": {
+      "servers": {
+        "unity": {
+          "trust": "untrusted"
+        }
+      }
+    }
+  }
 }

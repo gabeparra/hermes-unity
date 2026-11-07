@@ -16,3 +16,14 @@ stable release. Known gaps: the Unity package is unsigned (upstream #867), PlayM
 (upstream #1390), and the local endpoint has no authentication.
 
 To bump: change the version, tag commit, hashes and `--exclude-newer` date together, then re-run the smoke test.
+If the Hermes host keeps a native `mcp_servers.unity` entry in its `config.yaml` (to exclude tools, see below), that
+entry replaces this package's server entry, so update its `uvx` args (`mcpforunityserver==...`, `--exclude-newer`)
+there too.
+
+## Paid and out-of-scope tools
+
+In the 10.3.0 smoke run the server listed 48 tools including `generate_image`, `generate_audio`, `generate_model`
+and `blender_bridge` (the `asset_gen` group was enabled), and `manage_tools` can switch groups. A portable plugin
+cannot filter tools, so a host that must never reach paid providers should use a native `mcp_servers.unity` entry
+with `tools.exclude: [generate_image, generate_audio, generate_model, blender_bridge, manage_tools]`.
+`plugin.json` sets the server to `untrusted`, so every write-capable tool also asks first.
