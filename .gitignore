@@ -1,0 +1,18 @@
+# local scratch, third-party copies, private notes
+notes/
+UnityTest/
+# Unity
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+*.csproj
+*.sln
+# secrets
+.env
+*.key
+*.pem
+credentials*
