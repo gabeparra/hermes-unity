@@ -25,5 +25,5 @@ there too.
 In the 10.3.0 smoke run the server listed 48 tools including `generate_image`, `generate_audio`, `generate_model`
 and `blender_bridge` (the `asset_gen` group was enabled), and `manage_tools` can switch groups. A portable plugin
 cannot filter tools, so a host that must never reach paid providers should use a native `mcp_servers.unity` entry
-with `tools.exclude: [generate_image, generate_audio, generate_model, blender_bridge, manage_tools]`.
+with `tools.exclude: [generate_image, generate_audio, generate_model, blender_bridge, import_model, manage_tools]`.
 `plugin.json` sets the server to `untrusted`, so every write-capable tool also asks first.
