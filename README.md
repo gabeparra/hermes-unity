@@ -16,6 +16,11 @@ cube and a screenshot comes out the other end. Then Hermes itself drove the plug
 approvals on (connect and read the console, build a spinning-cube scene with a screenshot, write and run
 EditMode tests, refuse a paid tool). The results are in [plugin/TESTED.md](plugin/TESTED.md).
 
+<img src="docs/spinning-cube.png" width="420" alt="A cube with a yellow and grey checkerboard texture on a dark background">
+
+The scene from that run, as Hermes captured it through the plugin: it built the cube, light and camera, wrote the
+spin script, and made the checkerboard texture in the Editor after refusing the paid image tool.
+
 Not tested: macOS and Windows, the Editor with a visible window, PlayMode tests (upstream reports a hang on
 Linux/Vulkan, [issue 1390](https://github.com/CoplayDev/unity-mcp/issues/1390)), player builds, and running the
 plugin without a native tool-exclude entry.
