@@ -25,5 +25,9 @@ there too.
 In the 10.3.0 smoke run the server listed 48 tools including `generate_image`, `generate_audio`, `generate_model`
 and `blender_bridge` (the `asset_gen` group was enabled), and `manage_tools` can switch groups. A portable plugin
 cannot filter tools, so a host that must never reach paid providers should use a native `mcp_servers.unity` entry
-with `tools.exclude: [generate_image, generate_audio, generate_model, blender_bridge, import_model, manage_tools]`.
+with `tools.exclude: [generate_image, generate_audio, generate_model, blender_bridge, import_model, manage_tools, batch_execute]`.
 `plugin.json` sets the server to `untrusted`, so every write-capable tool also asks first.
+
+`batch_execute` runs many commands as one call: Hermes' approval and `tools.exclude` see only the outer call, and the
+Editor checks only its own saved tool-enabled setting (`BatchExecute.cs`). Exclude `batch_execute` too, and turn the
+dangerous tools off in the Editor (Window > MCP for Unity > Tools; saved per user, all projects).

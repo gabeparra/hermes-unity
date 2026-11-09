@@ -10,12 +10,15 @@ making a mess. This project is not affiliated with Unity Technologies or CoplayD
 
 ## Status
 
-Tested on Linux with Unity 6000.3 and a headless Editor: the server starts from this plugin's config, a script
-with a compile error is reported with file and line, gets fixed, and a scene with a cube and a screenshot comes
-out the other end. The results are in [plugin/TESTED.md](plugin/TESTED.md).
+Tested on Linux with Unity 6000.3 and a headless Editor. First the server was driven directly: it starts from
+this plugin's config, a script with a compile error is reported with file and line, gets fixed, and a scene with a
+cube and a screenshot comes out the other end. Then Hermes itself drove the plugin through four prompts with
+approvals on (connect and read the console, build a spinning-cube scene with a screenshot, write and run
+EditMode tests, refuse a paid tool). The results are in [plugin/TESTED.md](plugin/TESTED.md).
 
 Not tested: macOS and Windows, the Editor with a visible window, PlayMode tests (upstream reports a hang on
-Linux/Vulkan, [issue 1390](https://github.com/CoplayDev/unity-mcp/issues/1390)), and player builds.
+Linux/Vulkan, [issue 1390](https://github.com/CoplayDev/unity-mcp/issues/1390)), player builds, and running the
+plugin without a native tool-exclude entry.
 
 ## Requirements
 
@@ -64,6 +67,15 @@ This plugin makes an AI agent run code inside your Editor, so it is built to ask
 - **Untrusted server.** `plugin.json` declares the server as `untrusted`. Hermes asks before every tool call
   that is not marked read-only, with the choice of once, for the session or always, per tool. Upstream marks
   only a handful of tools as read-only, so even `read_console` will ask until you say "always".
+- **`batch_execute` skips both the prompts and the exclude list.** Hermes approves and filters only the outer
+  `batch_execute` call. The Editor then runs every command inside the batch and checks only its own saved
+  "tool enabled" setting (`BatchExecute.cs` in the pinned package). In testing, a `manage_gameobject` call ran
+  inside a batch with no prompt of its own. So after you allow `batch_execute` once, a batch could also run tools
+  you excluded in Hermes, such as `execute_code`. Two things close this: add `batch_execute` to the exclude list
+  below (it then costs one prompt per tool instead of one per batch), and turn the dangerous tools off in the
+  Editor itself under Window > MCP for Unity > Tools, which is the one switch that also holds inside a batch. Those
+  Editor settings are saved per user and apply to every Unity project on the machine.
+  `preflight.sh` prints a warning when it sees them still enabled.
 - **Pinned.** The server is `mcpforunityserver==10.3.0`, started through `uvx` with isolated, no-config,
   no-sources flags and an `--exclude-newer` date, so its dependencies are frozen to what existed on that date.
   The Unity package is pinned by commit. The release's tag commit and wheel hashes are in
@@ -75,7 +87,8 @@ This plugin makes an AI agent run code inside your Editor, so it is built to ask
 - **Paid and external tools.** The server also offers tools that can reach paid providers or marketplaces
   (`generate_image`, `generate_audio`, `generate_model`, `blender_bridge`, `import_model`), and `manage_tools`
   can switch tool groups on. The skill tells the agent never to call them, but that is only text. A portable
-  plugin cannot filter tools, so if you want them gone, define the server yourself in Hermes' `config.yaml`
+  plugin cannot filter tools, so if you want them gone, switch them off in the Editor (see above) and define the
+  server yourself in Hermes' `config.yaml`
   (this replaces the plugin's entry). Copy `command`, `args` and `env` from [plugin/mcp.json](plugin/mcp.json),
   replace `${PLUGIN_DATA}` with a real directory, and add:
 
@@ -85,7 +98,7 @@ This plugin makes an AI agent run code inside your Editor, so it is built to ask
       # command, args, env: copied from plugin/mcp.json
       trust: untrusted
       tools:
-        exclude: [generate_image, generate_audio, generate_model, blender_bridge, import_model, manage_tools]
+        exclude: [generate_image, generate_audio, generate_model, blender_bridge, import_model, manage_tools, batch_execute]
   ```
 
   When you bump the pinned version, update both places.
@@ -95,7 +108,7 @@ This plugin makes an AI agent run code inside your Editor, so it is built to ask
 
 ## What the skill covers
 
-The skill in `plugin/skills/unity-mcp/` tells Hermes to:
+The workflow skill in `plugin/skills/unity-mcp/` tells Hermes to:
 
 - run the preflight check before touching a project, and work in a clone if the project is in use elsewhere
 - read the project's own docs and use its own scripts for tests and builds
@@ -105,6 +118,8 @@ The skill in `plugin/skills/unity-mcp/` tells Hermes to:
 - use EditMode tests as the check, and skip PlayMode tests on Linux for now
 
 It also lists the quirks I hit in testing, such as `apply_text_edits` needing a hash from a first call.
+The companion skill `unity-scene-building` holds a starter scene, an EditMode test recipe and the quirks Hermes found
+while building scenes (screenshot transparency, lighting, texture and material setup).
 
 ## Layout
 
@@ -115,6 +130,7 @@ plugin/                     the Hermes plugin (this is what gets installed)
   PINS.md                   what is pinned and how to bump it
   TESTED.md                 what was run and what passed
   skills/unity-mcp/         the workflow skill and scripts/preflight.sh
+  skills/unity-scene-building/   recipes and verified quirks for scenes, screenshots, textures and EditMode tests
 RESEARCH.md                 why MCP for Unity, compared with three other options
 ```
 

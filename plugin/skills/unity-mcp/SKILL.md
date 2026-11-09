@@ -52,10 +52,13 @@ they ask too.
 0. **Guard flag.** Run `scripts/preflight.sh <project>` first. If it prints `GUARD` (exit 3), a flag the user set up
    (for example a game that has the GPU) is up: do not start an Editor, do not drive Unity, tell the user and wait.
    Hermes can still answer questions meanwhile. Never delete or ignore a guard flag.
+   If it prints `BRIDGE`, an Editor with the bridge already has the project: connect to it, do not start another.
+   If it prints `LOCKED`, someone else holds the project: leave it alone.
 
 1. Call `set_active_instance` if more than one Editor is open. It needs the `Name@hash` form, not just the name:
    read the `mcpforunity://instances` resource first. Only one Editor open means you can skip this.
-2. Call `manage_editor` for editor state. If it says compiling or in play mode, wait or stop play first.
+2. Read the `mcpforunity://editor/state` resource (`manage_editor` has no state query). If it says compiling or in
+   play mode, wait or stop play first.
 3. Call `read_console` (errors only) to see the starting state.
 
 ## Loop
@@ -73,12 +76,16 @@ they ask too.
 
 ## Habits
 
-- Batch related steps with `batch_execute` to cut round trips; stop at the first error.
+- Do not use `batch_execute`. It runs many commands as one call, so the user's approval prompts and the exclude
+  list see only the outer call and none of the commands inside. Make the calls one at a time.
 - Pass numbers as quoted strings if a tool rejects them.
 - When something fails twice, stop and report the exact error text instead of retrying variations.
 - Report only what the tools returned. If a screenshot or console read failed, say so.
 
 ## Tool quirks (tested against v10.3.0 on Unity 6000.3)
+
+Recipes and more quirks (scene building order, values, screenshots, textures, EditMode test setup) are in the
+companion skill `unity:unity-scene-building`. Load it before building a scene or writing tests.
 
 - `create_script` fails if the file exists ("Use 'update'"). To change a script use `apply_text_edits`: it is a
   **two-step call**. The first call returns `precondition_required` with `current_sha256`; repeat the same edit
