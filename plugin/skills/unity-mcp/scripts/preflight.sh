@@ -7,7 +7,7 @@ P="${1:-}"
 [ -d "$P/Assets" ] && [ -f "$P/ProjectSettings/ProjectVersion.txt" ] || { echo "usage: preflight.sh <UnityProject>"; exit 2; }
 P="$(cd "$P" && pwd)"
 bad=0
-# User-defined "do not use the GPU / do not start heavy work" flag files (for example a gaming guard).
+# User-defined "do not use the GPU / do not start heavy work" flag files (for example a flag set while a game is running).
 # One path per line in ${XDG_CONFIG_HOME:-~/.config}/hermes-unity/guard-files, or colon-separated in UNITY_MCP_GUARD_FILES.
 guards="${UNITY_MCP_GUARD_FILES:-}"
 gf="${XDG_CONFIG_HOME:-$HOME/.config}/hermes-unity/guard-files"

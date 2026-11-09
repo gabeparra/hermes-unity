@@ -17,6 +17,6 @@ UnityTest/
 *.pem
 credentials*
 
-# private game sandbox and local profiles: never commit
+# local scratch clones and private project profiles: never commit
 sandbox/
 local/
