@@ -21,6 +21,9 @@ C# scripts, console and compile errors, play mode, screenshots, builds) on Unity
 
 ## Candidates compared
 
+As of November 2026, from each project's README and the Hermes plugin catalog. Only the Coplay option was
+installed and run for this project; the other columns are what their own documentation says.
+
 | | Coplay MCP for Unity | IvanMurzak Unity-MCP | CoderGamester mcp-unity | Unity AI Assistant MCP (official) |
 |---|---|---|---|---|
 | Licence | MIT | Apache-2.0 | MIT | proprietary |
@@ -29,17 +32,18 @@ C# scripts, console and compile errors, play mode, screenshots, builds) on Unity
 | Transport | stdio or HTTP, loopback default | stdio, streamable HTTP, Docker, or cloud | Node.js stdio server, WebSocket to Editor on :8090 | local relay process |
 | Tools | ~50 direct tools | few tools; most work via an "RQL" query language | direct scene/GameObject/console tools plus `batch_execute` | not surveyed in depth |
 | Security | loopback default, LAN opt-in, no token | local or cloud | per-project 256-bit token, rejects browser Origin, `add_package` off by default | Unity account |
-| Catch | PlayMode tests hang on Linux/Vulkan (upstream #1390) | docs default to browser sign-in and a cloud endpoint | needs Node and a Unity-side start button | needs Unity subscription and the AI Assistant package |
+| Catch | PlayMode tests hang on Linux/Vulkan (upstream #1390) | README documents a browser sign-in and a cloud endpoint option | needs Node and a Unity-side start button | needs Unity subscription and the AI Assistant package |
 
 Why Coplay: largest tool set, a Python server that matches the existing Hermes pattern (`uvx`, pinned PyPI
 version), and an existing community Hermes plugin shows the pin works. mcp-unity has better local auth and is
-the fallback if we want token auth. Ivan's routes through a cloud account and an unusual query surface. Writing
+the fallback if we want token auth. IvanMurzak's README documents a cloud sign-in option and a query-language tool surface (RQL); I did not
+evaluate it further. Writing
 our own bridge means redoing main-thread dispatch, domain-reload survival, compile-error capture and screenshots.
 
 ## Existing Hermes plugins
 
-- The Hermes marketplace has no official Unity entry.
-- `csharp-game-editor` (community, v0.6.0) wraps the same `mcpforunityserver==10.3.0`, macOS only, with a
+- As of November 2026 the Hermes marketplace has no official Unity entry.
+- `csharp-game-editor` (community, v0.6.0) wraps the same `mcpforunityserver==10.3.0`, macOS only per its catalog entry, with a
   plan/approve layer. Closest prior art; read its SKILL.md and bridge, do not depend on it.
 - Format to copy: the official TouchDesigner plugin, a portable Agent Plugins v1 package with `plugin.json`,
   `mcp.json` and `skills/<name>/SKILL.md`. The Blender plugin is the stdio-with-pinned-upstream variant. The
