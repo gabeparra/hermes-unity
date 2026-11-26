@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate plugin JSON manifests
+        run: |
+          python3 -m json.tool plugin/plugin.json > /dev/null
+          python3 -m json.tool plugin/mcp.json > /dev/null
+      - name: Lint preflight script
+        run: |
+          bash -n plugin/skills/unity-mcp/scripts/preflight.sh
+          shellcheck plugin/skills/unity-mcp/scripts/preflight.sh
