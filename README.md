@@ -4,11 +4,13 @@ A [Hermes](https://hermes-agent.nousresearch.com) plugin that lets Hermes work i
 scenes and GameObjects, add components, write and edit C# scripts, read the console and compile errors, enter and
 leave play mode, take screenshots and make builds.
 
+**Status:** `Active` - Hermes plugin wrapping pinned MCP for Unity v10.3.0 (tested on Linux with Unity 6000.3).
+
 It does not contain a Unity bridge of its own. It runs [MCP for Unity](https://github.com/CoplayDev/unity-mcp)
 (MIT, by CoplayDev, pinned to v10.3.0) as an MCP server and adds a skill that tells Hermes how to use it without
 making a mess. This project is not affiliated with Unity Technologies or CoplayDev.
 
-## Status
+## Tested Environments
 
 Tested on Linux with Unity 6000.3 and a headless Editor. First the server was driven directly: it starts from
 this plugin's config, a script with a compile error is reported with file and line, gets fixed, and a scene with a
@@ -126,7 +128,9 @@ It also lists the quirks I hit in testing, such as `apply_text_edits` needing a 
 The companion skill `unity-scene-building` holds a starter scene, an EditMode test recipe and the quirks Hermes found
 while building scenes (screenshot transparency, lighting, texture and material setup).
 
-## Layout
+## Stack & Architecture
+
+- **Stack:** Hermes portable plugin manifests (`plugin.json`, `mcp.json`), pinned Python MCP server (`mcpforunityserver==10.3.0` via `uvx`), Bash preflight guard script, and Unity 6 Editor bridge (`MCPForUnity`).
 
 ```
 plugin/                     the Hermes plugin (this is what gets installed)
